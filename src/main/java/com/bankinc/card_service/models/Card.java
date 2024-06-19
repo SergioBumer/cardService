@@ -3,20 +3,20 @@ package com.bankinc.card_service.models;
 import java.time.LocalDate;
 import java.util.Date;
 
-import com.bankinc.card_service.CardStatus;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 
 @Entity
 @Setter
+@Getter
 public class Card {
 	@Id
 	private String cardId;
