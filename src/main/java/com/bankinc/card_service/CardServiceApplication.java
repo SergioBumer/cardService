@@ -1,4 +1,4 @@
-package com.bancinc.card_service;
+package com.bankinc.card_service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
