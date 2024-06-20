@@ -47,4 +47,5 @@ public class CardController {
 	public ResponseEntity<Map<String, String>> blockCard(@PathVariable String cardId) {
 		return cardService.blockCard(cardId);	
 	}
+	
 }
