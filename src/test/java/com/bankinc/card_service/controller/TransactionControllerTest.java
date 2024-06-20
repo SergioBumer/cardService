@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.HashMap;
@@ -23,36 +22,39 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.bankinc.card_service.service.CardBalanceService;
+import com.bankinc.card_service.service.TransactionService;
 
-@WebMvcTest(CardBalanceController.class)
+@WebMvcTest(TransactionController.class)
 @ExtendWith(MockitoExtension.class)
-public class CardBalanceControllerTest<T> {
+public class TransactionControllerTest<T> {
 
 	@Autowired
 	private MockMvc mockMvc;
 
 	@MockBean
-	CardBalanceService<T> cardService;
+	TransactionService transactionService;
 
 	@InjectMocks
-	CardController cardController;
+	TransactionController transactionController;
 
 	@Test
 	void testBalanceSuccessfullyRecharged() throws Exception {
-		when(cardService.balanceRecharge(any())).thenReturn(new ResponseEntity<Map<String, String>>(HttpStatus.OK));
-		String requestBody = "{\"cardId\": \"1234567890123456\", \"balance\": 20000.0}";
-		this.mockMvc.perform(post("/card/balance").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+		Map<String, String> responseBody = new HashMap<String, String>();
+		responseBody.put("transactionId", "1af90edc-82d5-41df-9a07-118e8dc5ee73");
+		when(transactionService.createPurchase(any()))
+				.thenReturn(new ResponseEntity<Map<String, String>>(responseBody, HttpStatus.OK));
+		String requestBody = "{\"cardId\": \"1234567890123456\", \"price\": 20000.0}";
+		this.mockMvc.perform(post("/transaction/purchase").contentType(MediaType.APPLICATION_JSON).content(requestBody))
 				.andExpect(status().isOk());
 	}
-
+	
 	@Test
-	void testBalanceSuccessfullyRetrieved() throws Exception {
-		var response = new HashMap<String, String>();
-		response.put("balance", "20000.0");
-		when(cardService.getCardBalance(anyString()))
-				.thenReturn(new ResponseEntity<Map<String, String>>(response, HttpStatus.OK));
-		this.mockMvc.perform(get("/card/balance/102030")).andExpect(status().isOk())
-				.andExpect(jsonPath("$.balance").value("20000.0"));
+	void testRetrieveTransaction() throws Exception {
+		Map<String, Object> responseBody = new HashMap<String, Object>();
+		responseBody.put("transactionId", "1af90edc-82d5-41df-9a07-118e8dc5ee73");
+		when(transactionService.getTransaction(anyString()))
+				.thenReturn(new ResponseEntity<Map<String, Object>>(responseBody, HttpStatus.OK));
+		this.mockMvc.perform(get("/transaction/1af90edc-82d5-41df-9a07-118e8dc5ee73").contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk());
 	}
 }

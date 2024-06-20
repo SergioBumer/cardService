@@ -5,7 +5,6 @@ import java.util.Map;
 import org.springframework.http.ResponseEntity;
 
 import com.bankinc.card_service.dto.BalanceRechargeDto;
-import com.bankinc.card_service.dto.CardNumberDto;
 
 public interface CardBalanceService<T> {
 

@@ -37,7 +37,6 @@ public class CardServiceImpl implements CardService {
 			cardId = generateCardId(productId);
 		}
 
-		// Add 3 years to the current date
 		LocalDate newDate = LocalDate.now().plusYears(3);
 		Card card = new Card();
 		card.setCardId(cardId);
@@ -60,7 +59,6 @@ public class CardServiceImpl implements CardService {
 
 	@Override
 	public ResponseEntity<Map<String, String>> enrollCard(String cardId) {
-		// TODO Auto-generated method stub
 		ResponseEntity<Map<String, String>> response;
 		Map<String, String> responseBody = new HashMap();
 		Card card = cardRepository.findById(cardId).orElse(null);
