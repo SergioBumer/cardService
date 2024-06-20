@@ -31,7 +31,8 @@ public class Transaction {
 	
 	public Transaction(){}
 
-	
-	
+	public void setTransactionStatus(TransactionStatus transactionStatus) {
+		this.transactionStatus = transactionStatus;
+	}
 	
 }

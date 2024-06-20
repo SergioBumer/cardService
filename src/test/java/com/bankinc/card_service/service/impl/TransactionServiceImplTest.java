@@ -20,9 +20,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.bankinc.card_service.dto.PurchaseDTO;
+import com.bankinc.card_service.dto.TransactionAnulationDto;
 import com.bankinc.card_service.models.Card;
 import com.bankinc.card_service.models.CardStatus;
 import com.bankinc.card_service.models.Transaction;
+import com.bankinc.card_service.models.TransactionStatus;
 import com.bankinc.card_service.repository.CardRepository;
 import com.bankinc.card_service.repository.TransactionRepository;
 
@@ -39,10 +41,12 @@ public class TransactionServiceImplTest {
 	TransactionServiceImpl transactionServiceImpl;
 	
 	static PurchaseDTO purchaseDTO;
+	static TransactionAnulationDto transactionAnulationDto;
 	
 	@BeforeAll
 	static void setup() {
 		purchaseDTO = PurchaseDTO.builder().cardId("1020307731398909").price(20000D).build();
+		transactionAnulationDto = TransactionAnulationDto.builder().cardId("1020301234567890").transactionId("be81556b-9b54-4091-aff6-a9c3c6decf54").build();
 	}
 	
 	@Test
@@ -134,5 +138,56 @@ public class TransactionServiceImplTest {
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 	}
 	
+	
+	@Test
+	void testTransactionToBeCancelledNotRetrieved() {
+		when(transactionRepository.findById(anyString())).thenReturn(Optional.empty());
+		
+		ResponseEntity<Map<String, String>> response = transactionServiceImpl.cancelTransaction(transactionAnulationDto);
+		
+		assertNotNull(response);
+		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+	}
+	
+	@Test
+	void testTransactionToBeCancelledNotActive() {
+		Transaction transaction = Transaction.builder().transactionId("be81556b-9b54-4091-aff6-a9c3c6decf54").transactionStatus(TransactionStatus.CANCELLED).build();
+		when(transactionRepository.findById(anyString())).thenReturn(Optional.of(transaction));
+		
+		ResponseEntity<Map<String, String>> response = transactionServiceImpl.cancelTransaction(transactionAnulationDto);
+		
+		assertNotNull(response);
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+	}
+	
+	@Test
+	void testTransactionToBeCancelledFailingBecauseOfPurchaseDate() {
+		Transaction transaction = Transaction.builder().transactionId("be81556b-9b54-4091-aff6-a9c3c6decf54").transactionStatus(TransactionStatus.CANCELLED).purchaseDate(LocalDate.now().minusDays(20)).build();
+		when(transactionRepository.findById(anyString())).thenReturn(Optional.of(transaction));
+		
+		ResponseEntity<Map<String, String>> response = transactionServiceImpl.cancelTransaction(transactionAnulationDto);
+		
+		assertNotNull(response);
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+	}
+	
+	@Test
+	void testTransactionToBeCancelledIsSuccessful() {
+		Card retrievedCard = new Card();
+		
+		LocalDate expirationDate = LocalDate.now().plusYears(10);
+		retrievedCard.setStatus(CardStatus.ACTIVE);
+		retrievedCard.setExpirationDate(expirationDate);
+		retrievedCard.setBalance(30000);
+		when(cardRepository.findById(anyString())).thenReturn(Optional.of(retrievedCard));
+		Transaction transaction = Transaction.builder().transactionId("be81556b-9b54-4091-aff6-a9c3c6decf54").price(20000).purchaseDate(LocalDate.now().plusDays(1)).transactionStatus(TransactionStatus.ACTIVE).build();
+		when(transactionRepository.findById(anyString())).thenReturn(Optional.of(transaction));
+		when(transactionRepository.findById(anyString())).thenReturn(Optional.of(transaction));
+		
+		ResponseEntity<Map<String, String>> response = transactionServiceImpl.cancelTransaction(transactionAnulationDto);
+		
+		assertNotNull(response);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+	}
 
 }

@@ -57,4 +57,13 @@ public class TransactionControllerTest<T> {
 		this.mockMvc.perform(get("/transaction/1af90edc-82d5-41df-9a07-118e8dc5ee73").contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk());
 	}
+	
+	@Test
+	void testBalanceCancelTransaction() throws Exception {
+		when(transactionService.createPurchase(any()))
+				.thenReturn(new ResponseEntity(HttpStatus.OK));
+		String requestBody = "{\"cardId\": \"1234567890123456\", \"transactionId\": \"1af90edc-82d5-41df-9a07-118e8dc5ee73\"}";
+		this.mockMvc.perform(post("/transaction/anulation").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+				.andExpect(status().isOk());
+	}
 }

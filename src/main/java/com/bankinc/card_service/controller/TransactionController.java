@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bankinc.card_service.dto.PurchaseDTO;
+import com.bankinc.card_service.dto.TransactionAnulationDto;
 import com.bankinc.card_service.service.TransactionService;
 
 @RestController
@@ -32,5 +33,10 @@ public class TransactionController {
 	public ResponseEntity<?> getTransaction(@PathVariable String transactionId) {
 		return transactionService.getTransaction(transactionId);
 		
+	}
+	
+	@PostMapping("/anulation")
+	public ResponseEntity<Map<String, String>> makeAPurchase(@RequestBody TransactionAnulationDto transactionAnulationDto) {
+		return transactionService.cancelTransaction(transactionAnulationDto);	
 	}
 }

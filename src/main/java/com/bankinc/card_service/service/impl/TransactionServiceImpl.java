@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.bankinc.card_service.dto.PurchaseDTO;
+import com.bankinc.card_service.dto.TransactionAnulationDto;
 import com.bankinc.card_service.models.Card;
 import com.bankinc.card_service.models.CardStatus;
 import com.bankinc.card_service.models.Transaction;
@@ -56,7 +57,7 @@ public class TransactionServiceImpl implements TransactionService {
 
 		String transactionId = createTransaction(card, purchaseDate, purchaseDTO.getPrice());
 
-		updateCardBalance(card, purchaseDTO.getPrice());
+		dicreaseCardBalance(card, purchaseDTO.getPrice());
 
 		responseBody.put("transactionId", transactionId);
 		response = new ResponseEntity<Map<String, String>>(responseBody, HttpStatus.OK);
@@ -68,8 +69,13 @@ public class TransactionServiceImpl implements TransactionService {
 		return card.getBalance() < price;
 	}
 
-	private void updateCardBalance(Card card, double price) {
+	private void dicreaseCardBalance(Card card, double price) {
 		card.setBalance(card.getBalance() - price);
+		cardRepository.save(card);
+	}
+	
+	private void increaseCardBalance(Card card, double price) {
+		card.setBalance(card.getBalance() + price);
 		cardRepository.save(card);
 	}
 
@@ -99,6 +105,37 @@ public class TransactionServiceImpl implements TransactionService {
 			    .addModule(new JavaTimeModule()).build();
 		Map < String, Object > mapObj = mapObject.convertValue(transaction, Map.class);
 		return new ResponseEntity<Map<String, Object>>(mapObj, HttpStatus.OK);
+	}
+
+	@Override
+	public ResponseEntity<Map<String, String>> cancelTransaction(TransactionAnulationDto transactionAnulationDto) {
+		Transaction transaction = transactionRepository.findById(transactionAnulationDto.getTransactionId()).orElse(null);
+		Map<String, String> responseBody = new HashMap<String, String>();
+		if(transaction == null) {
+			responseBody.put("error", "This transactionId doesn't exists.");
+			return new ResponseEntity<Map<String, String>>(responseBody, HttpStatus.NOT_FOUND);
+		} 
+		
+		if(!transaction.getTransactionStatus().equals(TransactionStatus.ACTIVE)) {
+			responseBody.put("error", "This transactionId is not active.");
+			return new ResponseEntity<Map<String, String>>(responseBody, HttpStatus.BAD_REQUEST);
+		}
+		
+		LocalDate todayMinus24Hours = LocalDate.now().minusDays(1);
+		
+		if(!todayMinus24Hours.isBefore(transaction.getPurchaseDate())) {
+			responseBody.put("error", "This transaction cannot be cancelled because of the time window.");
+			return new ResponseEntity<Map<String, String>>(responseBody, HttpStatus.BAD_REQUEST);
+		}
+		
+		transaction.setTransactionStatus(TransactionStatus.CANCELLED);
+		transactionRepository.save(transaction);
+		
+		Card card = cardRepository.findById(transactionAnulationDto.getCardId()).get();
+		increaseCardBalance(card, transaction.getPrice());
+		cardRepository.save(card);
+		
+		return new ResponseEntity<Map<String, String>>(HttpStatus.OK);
 	}
 
 }
