@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class PurchaseDTO {
+public class PurchaseDto {
 	private String cardId;
 	private double price;
 }

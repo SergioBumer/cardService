@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bankinc.card_service.dto.PurchaseDTO;
+import com.bankinc.card_service.dto.PurchaseDto;
 import com.bankinc.card_service.dto.TransactionAnulationDto;
 import com.bankinc.card_service.service.TransactionService;
 
@@ -25,7 +25,7 @@ public class TransactionController {
 	}
 	
 	@PostMapping("/purchase")
-	public ResponseEntity<Map<String, String>> makeAPurchase(@RequestBody PurchaseDTO purchaseDTO) {
+	public ResponseEntity<Map<String, String>> makeAPurchase(@RequestBody PurchaseDto purchaseDTO) {
 		return transactionService.createPurchase(purchaseDTO);	
 	}
 	

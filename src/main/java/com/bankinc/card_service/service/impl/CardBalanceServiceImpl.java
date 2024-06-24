@@ -31,13 +31,13 @@ public class CardBalanceServiceImpl<T> implements CardBalanceService<T> {
 
 		if (card == null) {
 			responseBody.put("error", "This card doesn't exists.");
-			response = new ResponseEntity<Map<String, String>>(responseBody, HttpStatus.NOT_FOUND);
+			response = new ResponseEntity<>(responseBody, HttpStatus.NOT_FOUND);
 		} else if (!card.getStatus().equals(CardStatus.ACTIVE)) {
 			responseBody.put("error", "This card's balance can't be recharged.");
-			response = new ResponseEntity<Map<String, String>>(responseBody, HttpStatus.BAD_REQUEST);
+			response = new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
 		} else {
 			card.setBalance(card.getBalance() + balanceRechargeDto.getBalance());
-			response = new ResponseEntity<Map<String, String>>(HttpStatus.OK);
+			response = new ResponseEntity<>(HttpStatus.OK);
 			cardRepository.save(card);
 		}
 
@@ -53,10 +53,10 @@ public class CardBalanceServiceImpl<T> implements CardBalanceService<T> {
 
 		if (card == null) {
 			responseBody.put("error", "This card doesn't exists.");
-			response = new ResponseEntity<Map<String, String>>(responseBody, HttpStatus.NOT_FOUND);
+			response = new ResponseEntity<>(responseBody, HttpStatus.NOT_FOUND);
 		} else {
 			responseBody.put("balance", String.valueOf(card.getBalance()));
-			response = new ResponseEntity<Map<String, String>>(responseBody, HttpStatus.OK);
+			response = new ResponseEntity<>(responseBody, HttpStatus.OK);
 		}
 
 		return response;

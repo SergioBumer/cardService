@@ -1,6 +1,7 @@
 package com.bankinc.card_service.models;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,14 +14,17 @@ import lombok.Setter;
 
 @Entity
 @Setter
-@Getter
 public class Card {
 	@Id
+	@Getter
 	private String cardId;
 	private String ownerFirstName;
 	private String ownerLastName;
-	private LocalDate expirationDate;
+	@Getter
+	private LocalDateTime expirationDate;
+	@Getter
 	private double balance;
+	@Getter
 	@Enumerated(EnumType.STRING)
     @Column(columnDefinition = "ENUM('ACTIVE', 'INACTIVE', 'BLOCKED', 'EXPIRED')")
 	private CardStatus status;

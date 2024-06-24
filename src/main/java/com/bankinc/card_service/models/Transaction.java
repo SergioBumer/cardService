@@ -1,6 +1,7 @@
 package com.bankinc.card_service.models;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,15 +25,12 @@ public class Transaction {
 	private String transactionId;
 	private String cardId;
 	private double price;
-	private LocalDate purchaseDate;
-	@Enumerated(EnumType.STRING)
+	private LocalDateTime purchaseDate;
+	@Setter
+    @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "ENUM('ACTIVE', 'CANCELED')")
 	private TransactionStatus transactionStatus;
 	
 	public Transaction(){}
 
-	public void setTransactionStatus(TransactionStatus transactionStatus) {
-		this.transactionStatus = transactionStatus;
-	}
-	
 }

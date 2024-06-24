@@ -14,7 +14,7 @@ Make sure you have the following installed on your machine:
 
 First, clone the repository to your local machine:
 
-```bash
+```bashn
 git clone https://github.com/SergioBumer/cardService.git
 git checkout master
 ```

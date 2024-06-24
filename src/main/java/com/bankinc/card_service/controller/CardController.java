@@ -32,10 +32,10 @@ public class CardController {
 		String cardId = cardService.createCard(productId);
 		if (cardId.equals("0")) {
 			responseObject.put("error", "Is not a valid productId.");
-			return new ResponseEntity<Map<String, String>>(responseObject, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(responseObject, HttpStatus.BAD_REQUEST);
 		}
 		responseObject.put("cardId", cardId);
-		return new ResponseEntity<Map<String, String>>(responseObject, HttpStatus.OK);
+		return new ResponseEntity<>(responseObject, HttpStatus.OK);
 	}
 
 	@PostMapping("enroll")
